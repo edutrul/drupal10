@@ -40,15 +40,19 @@ jobs:
         fi
         MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
         echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
+        echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
+        echo "PANTHEON_SITE_NAME=$pantheon_site_name" >> $GITHUB_ENV
     - name: Add deploy URL to PR description
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const { MULTIDEV_URL, BASE_BRANCH, pantheon_site_name } = process.env;
+          const MULTIDEV_URL = process.env.MULTIDEV_URL;
+          const BASE_BRANCH = process.env.BASE_BRANCH;
+          const PANTHEON_SITE_NAME = process.env.PANTHEON_SITE_NAME;
           const doubleDash = (str) => str.replace(/-/g, '--');
-          const site = doubleDash(pantheon_site_name);
+          const site = doubleDash(PANTHEON_SITE_NAME);
           const branch = doubleDash(BASE_BRANCH);
           github.rest.issues.createComment({
             issue_number: context.issue.number,
