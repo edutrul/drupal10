@@ -4,9 +4,16 @@ on:
     branches:
       - '*'
       - '!main'
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+      id-token: write
     steps:
     - uses: actions/checkout@v1
     - uses: shimataro/ssh-key-action@v2
@@ -26,13 +33,26 @@ jobs:
         BASE_BRANCH=${GITHUB_REF##*/}
         git remote add pantheon $pantheon_repo
         git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
-        terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
+        if ! terminus env:info $pantheon_site_name.$BASE_BRANCH > /dev/null 2>&1; then
+            terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
+        else
+            echo "Environment $BASE_BRANCH already exists."
+        fi
+        MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
+        echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
     - name: Add deploy URL to PR description
-      uses: chabroA/action-append-pr-description@master
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
       with:
-        auth: ${{ secrets.GITHUB_TOKEN }}
-        repo: ${{ github.event.repository.name }}
-        owner: ${{ github.repository_owner }}
-        pr: ${{ github.event.number }}
-        url: "https://${{ github.ref_name }}-${{ secrets.PANTHEON_SITE_NAME }}.pantheonsite.io/"
-        message: "Deployment URL: "
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { MULTIDEV_URL, BASE_BRANCH, pantheon_site_name } = process.env;
+          const doubleDash = (str) => str.replace(/-/g, '--');
+          const site = doubleDash(pantheon_site_name);
+          const branch = doubleDash(BASE_BRANCH);
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `[![Static Badge](https://img.shields.io/badge/${site}-${branch}-%23FFDC28?logo=pantheon&logoColor=white)](${MULTIDEV_URL})`
+          });
