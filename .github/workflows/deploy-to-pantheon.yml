@@ -27,3 +27,12 @@ jobs:
         git remote add pantheon $pantheon_repo
         git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
         terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
+    - name: Add deploy URL to PR description
+      uses: chabroA/action-append-pr-description@master
+      with:
+        auth: ${{ secrets.GITHUB_TOKEN }}
+        repo: ${{ github.event.repository.name }}
+        owner: ${{ github.repository_owner }}
+        pr: ${{ github.event.number }}
+        url: "https://${{ github.ref_name }}-${{ secrets.PANTHEON_SITE_NAME }}.pantheonsite.io/"
+        message: "Deployment URL: "
