@@ -27,6 +27,12 @@ jobs:
         run: |
           BASE_BRANCH=${GITHUB_REF##*/}
           git remote add pantheon $pantheon_repo
+
+          # Set to git mode
+          if terminus env:info $pantheon_site_name.$BASE_BRANCH > /dev/null 2>&1; then
+            terminus connection:set $pantheon_site_name.$BASE_BRANCH git
+          fi
+
           git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
 
           # Check if the multidev environment already exists
