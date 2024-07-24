@@ -38,14 +38,14 @@ jobs:
         pantheon_repo: '${{ secrets.PANTHEON_REPO }}'
         pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
       run: |
-        BASE_BRANCH=${GITHUB_REF##*/}
+        BASE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})
         git remote add pantheon $pantheon_repo
         git fetch pantheon
         git checkout -b $BASE_BRANCH || git checkout $BASE_BRANCH
         git pull pantheon $BASE_BRANCH --rebase
         git push pantheon HEAD:refs/heads/$BASE_BRANCH --force
         if ! terminus env:info $pantheon_site_name.$BASE_BRANCH > /dev/null 2>&1; then
-            terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
+            terminus multidev:create $pantheon_site_name.dev $BASE_BRANCH
         else
             echo "Environment $BASE_BRANCH already exists."
         fi
