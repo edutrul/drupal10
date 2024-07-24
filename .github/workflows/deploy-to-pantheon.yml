@@ -25,34 +25,15 @@ jobs:
       uses: kopepasah/setup-pantheon-terminus@master
       with:
         pantheon-machine-token: ${{ secrets.PANTHEON_MACHINE_TOKEN }}
-    - name: Get Committer Email and Name
-      run: |
-        COMMITTER_EMAIL=$(git log --format='%ae' -n 1 ${{ github.sha }})
-        COMMITTER_NAME=$(git log --format='%an' -n 1 ${{ github.sha }})
-
-        # Configure git defaults
-        git config --global user.email "$COMMITTER_EMAIL"
-        git config --global user.name "$COMMITTER_NAME"
     - name: deployer
       env:
         pantheon_repo: '${{ secrets.PANTHEON_REPO }}'
         pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
       run: |
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          BASE_BRANCH=${{ github.event.pull_request.head.ref }}
-        else
-          BASE_BRANCH=${GITHUB_REF##*/}
-        fi
+        BASE_BRANCH=${GITHUB_REF##*/}
         git remote add pantheon $pantheon_repo
-        git fetch pantheon
-        git checkout -b $BASE_BRANCH || git checkout $BASE_BRANCH
-        git pull pantheon $BASE_BRANCH --rebase || (git rebase --abort && exit 1)
-        git push pantheon HEAD:refs/heads/$BASE_BRANCH --force
-        if ! terminus env:info $pantheon_site_name.$BASE_BRANCH > /dev/null 2>&1; then
-            terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
-        else
-            echo "Environment $BASE_BRANCH already exists."
-        fi
+        git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
+        terminus multidev:create $pantheon_site_name.live 
         MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
         echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
         echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
