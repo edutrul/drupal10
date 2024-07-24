@@ -22,4 +22,4 @@ jobs:
           jira-base-url: https://nammweb.atlassian.net/
           skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
           jira-project-key: 'NWR'
-          custom-issue-number-regexp: 'NWR-\d+'
+          custom-issue-number-regexp: '^\d+'
