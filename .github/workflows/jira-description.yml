@@ -13,5 +13,5 @@ jobs:
           jira-token: ${{ secrets.JIRA_TOKEN }}
           jira-base-url: https://nammweb.atlassian.net/
           skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
-          custom-issue-number-regexp: '^MVR-\d+' #optional
+          custom-issue-number-regexp: '^([A-Z]+-\d+)' #optional
           jira-project-key: 'MVR' #optional
