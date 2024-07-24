@@ -31,12 +31,3 @@ jobs:
           terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
           MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
           echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
-      - name: Add deploy URL to PR description
-        uses: chabroA/action-append-pr-description@master
-        with:
-          auth: ${{ secrets.GITHUB_TOKEN }}
-          repo: ${{ github.event.repository.name }}
-          owner: ${{ github.repository_owner }}
-          pr: ${{ github.event.number }}
-          url: ${{ env.MULTIDEV_URL }}
-          message: "My url: "
