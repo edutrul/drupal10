@@ -25,14 +25,6 @@ jobs:
       uses: kopepasah/setup-pantheon-terminus@master
       with:
         pantheon-machine-token: ${{ secrets.PANTHEON_MACHINE_TOKEN }} 
-    - name: Get Committer Email and Name
-      run: |
-        COMMITTER_EMAIL=$(git log --format='%ae' -n 1 ${{ github.sha }})
-        COMMITTER_NAME=$(git log --format='%an' -n 1 ${{ github.sha }})
-
-        # Configure git defaults
-        git config --global user.email "$COMMITTER_EMAIL"
-        git config --global user.name "$COMMITTER_NAME"
     - name: deployer
       env:
         pantheon_repo: '${{ secrets.PANTHEON_REPO }}'
@@ -40,24 +32,9 @@ jobs:
       run: |
         BASE_BRANCH=${GITHUB_REF##*/}
         git remote add pantheon $pantheon_repo
-        git pull pantheon $BASE_BRANCH --rebase
         git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
-        if ! terminus env:info $pantheon_site_name.$BASE_BRANCH > /dev/null 2>&1; then
-            terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
-        else
-            echo "Environment $BASE_BRANCH already exists."
-        fi
+        terminus multidev:create $pantheon_site_name.live 
         MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
         echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
         echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
         echo "PANTHEON_SITE_NAME=$pantheon_site_name" >> $GITHUB_ENV
-    - name: Add deploy URL to PR description
-      if: github.event_name == 'pull_request'
-      uses: chabroA/action-append-pr-description@master
-      with:
-        auth: ${{ secrets.GITHUB_TOKEN }}
-        repo: ${{ github.event.repository.name }}
-        owner: ${{ github.repository_owner }}
-        pr: ${{ github.event.number }}
-        url: ${{ env.MULTIDEV_URL }}
-        message: "Deployment URL: "
