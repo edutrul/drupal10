@@ -50,4 +50,4 @@ jobs:
           jira-base-url: https://nammweb.atlassian.net/
           skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
           custom-issue-number-regexp: '^\d+' #optional
-          jira-project-key: 'PRJ' #optional
+          jira-project-key: 'NWR' #optional
