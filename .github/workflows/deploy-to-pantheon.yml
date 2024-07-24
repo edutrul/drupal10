@@ -19,6 +19,7 @@ jobs:
       with:
         pantheon-machine-token: ${{ secrets.PANTHEON_MACHINE_TOKEN }}
     - name: deployer
+      id: deploy
       env:
         pantheon_repo: '${{ secrets.PANTHEON_REPO }}'
         pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
@@ -29,6 +30,8 @@ jobs:
         terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
         MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
         echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
+        echo "::set-output name=url::$MULTIDEV_URL"
+
     - name: Set output
       id: deploy
       run: echo "::set-output name=url::$MULTIDEV_URL"
