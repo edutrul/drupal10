@@ -4,20 +4,11 @@ on:
     branches:
       - '*'
       - '!main'
-  pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write
-      id-token: write
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0  # This ensures that the entire git history is cloned.
+    - uses: actions/checkout@v1
     - uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.PANTHEON_SSH_KEY }}
@@ -37,15 +28,3 @@ jobs:
         git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
         terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
 
-  add-jira-description:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: cakeinpanic/jira-description-action@master
-        name: jira-description-action
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          jira-token: ${{ secrets.JIRA_TOKEN }}
-          jira-base-url: https://nammweb.atlassian.net/
-          skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
-          custom-issue-number-regexp: '^\d+' #optional
-          jira-project-key: 'NWR' #optional
