@@ -15,7 +15,7 @@ jobs:
       repository-projects: write
       id-token: write
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.PANTHEON_SSH_KEY }}
@@ -27,18 +27,22 @@ jobs:
         pantheon-machine-token: ${{ secrets.PANTHEON_MACHINE_TOKEN }}
     - name: Get Committer Email and Name
       run: |
-          COMMITTER_EMAIL=$(git log --format='%ae' -n 1 ${{ github.sha }})
-          COMMITTER_NAME=$(git log --format='%an' -n 1 ${{ github.sha }})
+        COMMITTER_EMAIL=$(git log --format='%ae' -n 1 ${{ github.sha }})
+        COMMITTER_NAME=$(git log --format='%an' -n 1 ${{ github.sha }})
 
-          # Configure git defaults
-          git config --global user.email "$COMMITTER_EMAIL"
-          git config --global user.name "$COMMITTER_NAME"
+        # Configure git defaults
+        git config --global user.email "$COMMITTER_EMAIL"
+        git config --global user.name "$COMMITTER_NAME"
     - name: deployer
       env:
         pantheon_repo: '${{ secrets.PANTHEON_REPO }}'
         pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
       run: |
-        BASE_BRANCH=$(echo ${GITHUB_REF#refs/heads/})
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          BASE_BRANCH=${{ github.event.pull_request.head.ref }}
+        else
+          BASE_BRANCH=${GITHUB_REF##*/}
+        fi
         git remote add pantheon $pantheon_repo
         git fetch pantheon
         git checkout -b $BASE_BRANCH || git checkout $BASE_BRANCH
