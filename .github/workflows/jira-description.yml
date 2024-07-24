@@ -27,13 +27,3 @@ jobs:
           jira-project-key: 'NWR'
           custom-issue-number-regexp: '^\d+'
 
-      - name: Additional debug
-        run: |
-          echo "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
-          echo "JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}"
-          echo "JIRA_BASE_URL: https://nammweb.atlassian.net/"
-          echo "PR Title: ${{ github.event.pull_request.title }}"
-          echo "PR Body: ${{ github.event.pull_request.body }}"
-          curl -H "Authorization: Bearer ${{ secrets.JIRA_TOKEN }}" \
-               -H "Content-Type: application/json" \
-               "https://nammweb.atlassian.net/rest/api/3/issue/NWR-45"
