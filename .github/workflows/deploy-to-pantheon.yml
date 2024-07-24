@@ -42,7 +42,7 @@ jobs:
         git remote add pantheon $pantheon_repo
         git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
         if ! terminus env:info $pantheon_site_name.$BASE_BRANCH > /dev/null 2>&1; then
-            terminus multidev:create $pantheon_site_name.dev $BASE_BRANCH
+            terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
         else
             echo "Environment $BASE_BRANCH already exists."
         fi
