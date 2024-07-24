@@ -16,6 +16,8 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # This ensures a full clone with full history
     - uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.PANTHEON_SSH_KEY }}
@@ -48,7 +50,7 @@ jobs:
           terminus connection:set $pantheon_site_name.$PR_BRANCH_NAME git
         fi
 
-        # Fetch full history from pantheon
+        # Fetch full history from Pantheon
         git fetch pantheon --unshallow
 
         # Sync branch
