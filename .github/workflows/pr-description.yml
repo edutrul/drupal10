@@ -3,6 +3,7 @@ name: Add Deploy URL to PR Description
 on:
   pull_request:
     types: [opened, edited]
+
 jobs:
   update-pr-description:
     runs-on: ubuntu-latest
@@ -17,6 +18,8 @@ jobs:
         uses: chabroA/action-append-pr-description@master
         with:
           auth: ${{ secrets.GITHUB_TOKEN }}
-          repo: ${{ github.repository }}
+          repo: ${{ github.event.repository.name }}
+          owner: ${{ github.repository_owner }}
           pr: ${{ github.event.pull_request.number }}
-          message: "My url: ${{ env.MULTIDEV_URL }}"
+          url: ${{ env.MULTIDEV_URL }}
+          message: "My url: "
