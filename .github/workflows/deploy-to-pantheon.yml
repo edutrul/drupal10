@@ -30,10 +30,10 @@ jobs:
           git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
 
           # Check if the multidev environment already exists
-          if terminus multidev:list $pantheon_site_name --field=ID | grep -q "^$BASE_BRANCH$"; then
-            echo "The environment $BASE_BRANCH already exists. Skipping creation."
-          else
+          if ! terminus env:info $pantheon_site_name.$BASE_BRANCH > /dev/null 2>&1; then
             terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
+          else
+            echo "Environment $BASE_BRANCH already exists."
           fi
 
           MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
