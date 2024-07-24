@@ -27,4 +27,8 @@ jobs:
         git remote add pantheon $pantheon_repo
         git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
         terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
-
+        MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
+        echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
+    - name: Set output
+      id: deploy
+      run: echo "::set-output name=url::$MULTIDEV_URL"

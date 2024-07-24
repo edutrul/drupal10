@@ -1,0 +1,30 @@
+name: jira-description-action
+on:
+  pull_request:
+    types: [opened, edited]
+jobs:
+  add-jira-description:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Get deployment URL
+        id: get_url
+        run: echo "MULTIDEV_URL=${{ steps.deploy.outputs.url }}" >> $GITHUB_ENV
+      - uses: cakeinpanic/jira-description-action@master
+        name: jira-description-action
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-token: ${{ secrets.JIRA_TOKEN }}
+          jira-base-url: https://nammweb.atlassian.net/
+          skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
+          custom-issue-number-regexp: '^\d+' #optional
+          jira-project-key: 'mvr' #optional
+      - name: Add deploy URL to PR description
+        uses: chabroA/action-append-pr-description@master
+        with:
+          auth: ${{ secrets.GITHUB_TOKEN }}
+          repo: ${{ github.event.repository.name }}
+          owner: ${{ github.repository_owner }}
+          pr: ${{ github.event.number }}
+          url: ${{ env.MULTIDEV_URL }}
+          message: "Deployment URL: "
