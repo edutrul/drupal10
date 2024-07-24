@@ -16,6 +16,8 @@ jobs:
       id-token: write
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # This ensures that the entire git history is cloned.
     - uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.PANTHEON_SSH_KEY }}
