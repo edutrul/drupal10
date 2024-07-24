@@ -4,6 +4,7 @@ on:
     branches:
       - '*'
       - '!main'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,13 +19,23 @@ jobs:
       uses: kopepasah/setup-pantheon-terminus@master
       with:
         pantheon-machine-token: ${{ secrets.PANTHEON_MACHINE_TOKEN }}
+    - name: Validate and rename branch if necessary
+      id: rename_branch
+      run: |
+        BASE_BRANCH=${GITHUB_REF##*/}
+        VALID_BRANCH=$(echo "$BASE_BRANCH" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]' | cut -c1-10)
+        if [ "$BASE_BRANCH" != "$VALID_BRANCH" ]; then
+          git branch -m $BASE_BRANCH $VALID_BRANCH
+          git push origin :$BASE_BRANCH
+          git push origin $VALID_BRANCH
+        fi
+        echo "::set-output name=branch::${VALID_BRANCH:-$BASE_BRANCH}"
     - name: deployer
       env:
         pantheon_repo: '${{ secrets.PANTHEON_REPO }}'
         pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
+        BASE_BRANCH: ${{ steps.rename_branch.outputs.branch }}
       run: |
-        BASE_BRANCH=${GITHUB_REF##*/}
         git remote add pantheon $pantheon_repo
         git push -u pantheon HEAD:refs/heads/$BASE_BRANCH
         terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
-
