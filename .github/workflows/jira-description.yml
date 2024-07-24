@@ -14,4 +14,4 @@ jobs:
           jira-base-url: https://nammweb.atlassian.net/
           skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
           jira-project-key: 'MVR'
-          custom-issue-number-regexp: '\d+' 
+          custom-issue-number-regexp: 'MVR-\d+'

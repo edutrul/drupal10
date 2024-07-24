@@ -8,11 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set environment variables
-        env:
-          pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
         run: |
           BASE_BRANCH=${GITHUB_HEAD_REF##*/}
-          MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
+          MULTIDEV_URL="https://$BASE_BRANCH-namm-mp-1.pantheonsite.io"
           echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
 
       - name: Add deploy URL to PR description
