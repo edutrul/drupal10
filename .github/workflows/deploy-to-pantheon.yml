@@ -29,7 +29,27 @@ jobs:
         terminus multidev:create $pantheon_site_name.live $BASE_BRANCH
         MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
         echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
-        echo "::set-output name=url::$MULTIDEV_URL"
 
-    - name: Set output
-      run: echo "::set-output name=url::$MULTIDEV_URL"
+  add-jira-description:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: cakeinpanic/jira-description-action@master
+        name: jira-description-action
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-token: ${{ secrets.JIRA_TOKEN }}
+          jira-base-url: https://nammweb.atlassian.net/
+          skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
+          custom-issue-number-regexp: '^\d+' #optional
+          jira-project-key: 'mvr' #optional
+      - name: Add deploy URL to PR description
+        uses: chabroA/action-append-pr-description@master
+        with:
+          auth: ${{ secrets.GITHUB_TOKEN }}
+          repo: ${{ github.event.repository.name }}
+          owner: ${{ github.repository.owner.login }}
+          pr: ${{ github.event.pull_request.number }}
+          url: ${{ env.MULTIDEV_URL }}
+          message: "Deployment URL: "
