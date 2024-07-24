@@ -44,19 +44,11 @@ jobs:
         echo "PANTHEON_SITE_NAME=$pantheon_site_name" >> $GITHUB_ENV
     - name: Add deploy URL to PR description
       if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
+      uses: chabroA/action-append-pr-description@master
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const MULTIDEV_URL = process.env.MULTIDEV_URL;
-          const BASE_BRANCH = process.env.BASE_BRANCH;
-          const PANTHEON_SITE_NAME = process.env.PANTHEON_SITE_NAME;
-          const doubleDash = (str) => str.replace(/-/g, '--');
-          const site = doubleDash(PANTHEON_SITE_NAME);
-          const branch = doubleDash(BASE_BRANCH);
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `[![Static Badge](https://img.shields.io/badge/${site}-${branch}-%23FFDC28?logo=pantheon&logoColor=white)](${MULTIDEV_URL})`
-          });
+        auth: ${{ secrets.GITHUB_TOKEN }}
+        repo: ${{ github.event.repository.name }}
+        owner: ${{ github.repository_owner }}
+        pr: ${{ github.event.number }}
+        url: ${{ env.MULTIDEV_URL }}
+        message: "Deployment URL: "
