@@ -14,12 +14,11 @@ jobs:
           BASE_BRANCH=${GITHUB_HEAD_REF##*/}
           MULTIDEV_URL="https://$BASE_BRANCH-$pantheon_site_name.pantheonsite.io"
           echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
+
       - name: Add deploy URL to PR description
         uses: chabroA/action-append-pr-description@master
         with:
           auth: ${{ secrets.GITHUB_TOKEN }}
-          repo: ${{ github.repository.name }}
-          owner: ${{ github.repository_owner }}
+          repo: ${{ github.repository }}
           pr: ${{ github.event.pull_request.number }}
-          url: ${{ env.MULTIDEV_URL }}
-          message: "My url: "
+          message: "My url: ${{ env.MULTIDEV_URL }}"
