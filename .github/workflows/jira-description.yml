@@ -26,4 +26,3 @@ jobs:
           skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
           jira-project-key: 'NWR'
           custom-issue-number-regexp: '^\d+'
-
