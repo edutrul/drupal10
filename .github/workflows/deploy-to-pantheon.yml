@@ -38,3 +38,16 @@ jobs:
         echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
         echo "BASE_BRANCH=$BASE_BRANCH" >> $GITHUB_ENV
         echo "PANTHEON_SITE_NAME=$pantheon_site_name" >> $GITHUB_ENV
+
+  add-jira-description:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cakeinpanic/jira-description-action@master
+        name: jira-description-action
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jira-token: ${{ secrets.JIRA_TOKEN }}
+          jira-base-url: https://nammweb.atlassian.net/
+          skip-branches: '^(production-release|main|master|release\/v\d+)$' #optional 
+          custom-issue-number-regexp: '^\d+' #optional
+          jira-project-key: 'PRJ' #optional
