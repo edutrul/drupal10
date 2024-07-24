@@ -19,7 +19,6 @@ jobs:
       with:
         pantheon-machine-token: ${{ secrets.PANTHEON_MACHINE_TOKEN }}
     - name: deployer
-      id: deploy
       env:
         pantheon_repo: '${{ secrets.PANTHEON_REPO }}'
         pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
@@ -33,5 +32,4 @@ jobs:
         echo "::set-output name=url::$MULTIDEV_URL"
 
     - name: Set output
-      id: deploy
       run: echo "::set-output name=url::$MULTIDEV_URL"

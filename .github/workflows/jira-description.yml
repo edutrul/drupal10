@@ -8,7 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Get deployment URL
-        id: get_url
         run: |
           echo "MULTIDEV_URL=${{ github.event.inputs.MULTIDEV_URL }}" >> $GITHUB_ENV
       - uses: cakeinpanic/jira-description-action@master
