@@ -28,13 +28,19 @@ jobs:
           BASE_BRANCH=${GITHUB_REF##*/}
           SHORT_BRANCH=$(echo "$BASE_BRANCH" | sed -E 's/.*(NWR-[0-9]+).*/\1/' | tr '[:upper:]' '[:lower:]')
           git remote add pantheon $pantheon_repo
+
+          # Set to git mode
+          if terminus env:info $pantheon_site_name.$SHORT_BRANCH > /dev/null 2>&1; then
+            terminus connection:set $pantheon_site_name.$SHORT_BRANCH git
+          fi
+
           git push -u pantheon HEAD:refs/heads/$SHORT_BRANCH
 
           # Check if the multidev environment already exists
-          if terminus multidev:list $pantheon_site_name --field=ID | grep -q "^$SHORT_BRANCH$"; then
-            echo "The environment $SHORT_BRANCH already exists. Skipping creation."
-          else
+          if ! terminus env:info $pantheon_site_name.$SHORT_BRANCH > /dev/null 2>&1; then
             terminus multidev:create $pantheon_site_name.live $SHORT_BRANCH
+          else
+            echo "Environment $SHORT_BRANCH already exists."
           fi
 
           MULTIDEV_URL="https://$SHORT_BRANCH-$pantheon_site_name.pantheonsite.io"
