@@ -26,6 +26,8 @@ jobs:
           pantheon_site_name: '${{ secrets.PANTHEON_SITE_NAME }}'
         run: |
           BASE_BRANCH=${GITHUB_REF##*/}
+
+          # Extract JIRA key and convert to lowercase
           SHORT_BRANCH=$(echo "$BASE_BRANCH" | sed -E 's/.*(NWR-[0-9]+).*/\1/' | tr '[:upper:]' '[:lower:]')
           git remote add pantheon $pantheon_repo
 
