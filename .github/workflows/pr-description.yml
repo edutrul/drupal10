@@ -13,7 +13,8 @@ jobs:
       - name: Set environment variables
         run: |
           BASE_BRANCH=${GITHUB_HEAD_REF##*/}
-          MULTIDEV_URL="https://$BASE_BRANCH-namm-mp-1.pantheonsite.io"
+          SHORT_BRANCH=$(echo "$BASE_BRANCH" | sed -E 's/.*(NWR-[0-9]+).*/\1/' | tr '[:upper:]' '[:lower:]')
+          MULTIDEV_URL="https://$SHORT_BRANCH-namm-mp-1.pantheonsite.io"
           echo "MULTIDEV_URL=$MULTIDEV_URL" >> $GITHUB_ENV
 
       - name: Add deploy URL to PR description
